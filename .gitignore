@@ -2,3 +2,9 @@
 *.jugdata/
 /.tmp/
 /logs/
+/3*/
+/matched/
+*.hea
+*.dat
+RECORDS*
+/wget_dir/
