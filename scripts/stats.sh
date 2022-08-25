@@ -53,7 +53,7 @@ do
 done
 
 rm -f disk_usage.stats
-for d in "${_dirs[@]}" ; do printf "%s\0" "${d}" ; done | du -s --files0-from - > disk_usage.stats
+for d in "${_dirs[@]}" ; do printf "%s\0" "${d}" ; done | du -Ls --files0-from - > disk_usage.stats
 
 for d in "${_dirs[@]}"
 do
