@@ -2,14 +2,13 @@
 
 source scripts/utils.sh echo -n
 
-function install_datalad {
-	init_venv --name venv --prefix .tmp/
-	exit_on_error_code "Failed to init venv"
+git-annex version >/dev/null
+exit_on_error_code "git-annex is missing"
 
-	datalad --version >/dev/null 2>&1 || python3 -m pip install -r scripts/requirements_datalad.txt
-	exit_on_error_code "Failed to install datalad requirements: pip install"
-}
+datalad --version >/dev/null
+exit_on_error_code "datalad is missing"
 
-datalad --version >/dev/null 2>&1 || install_datalad
-exit_on_error_code "Failed to install datalad requirements: pip install"
+# Add bin to PATH
+[[ -d "$(realpath bin/)" ]] && export PATH="${PATH}:$(realpath bin)"
+
 datalad "$@"

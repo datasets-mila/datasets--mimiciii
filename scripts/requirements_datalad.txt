@@ -1,1 +1,2 @@
+datalad[core]==0.11.8
 datalad==0.11.8

@@ -2,6 +2,7 @@
 *.jugdata/
 /.tmp/
 /logs/
+/bin/git-lfs-linux-amd64-v*/
 /3*/
 /matched/
 *.hea
