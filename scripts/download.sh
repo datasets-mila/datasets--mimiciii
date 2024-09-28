@@ -14,11 +14,10 @@ files_url=(
         "https://physionet.org/files/mimic3wdb/1.0/LICENSE.txt LICENSE.txt"
         "https://physionet.org/files/mimic3wdb/1.0/SHA256SUMS.txt SHA256SUMS.txt")
 
-git-annex addurl --fast -c annex.largefiles=anything --raw --batch --with-files <<EOF
-$(for file_url in "${files_url[@]}" ; do echo "${file_url}" ; done)
-EOF
-git-annex get --fast -J8
-git-annex migrate --fast -c annex.largefiles=anything *
+for file_url in "${files_url[@]}"
+do
+	echo "${file_url}"
+done | add_urls
 
 # Link wget download dir to dataset dir
 mkdir -p wget_dir/physionet.org/files/mimic3wdb/
@@ -36,11 +35,25 @@ ls -d 3*/ matched/p*/ | \
 	_MAIN_PROC=$$ _SNAME=${_SNAME} xargs -n1 -P8 sh -a -c 'wget -r -N -c -np https://physionet.org/files/mimic3wdb/1.0/$0 -P wget_dir/ -o /dev/stderr \
 	1>logs/${_SNAME}_${_MAIN_PROC}.out_$$ 2>logs/${_SNAME}_${_MAIN_PROC}.err_$$'
 
-for d in 3*/3*/ matched/p*/*/ 3*/RECORDS* 3*/3*/RECORDS* matched/RECORDS* matched/p*/p*/RECORDS* RECORDS*
+for d in 3*/ matched/ RECORDS* index.html
 do
 	printf "%s\n" "${d}"
-done | sort -u | ./scripts/stats.sh
+done | add_files --no-annex
 
 git-annex add --fast -c annex.largefiles=nothing *.stats
 
-[[ -f SHA256SUMS.txt ]] && sha256sum -c SHA256SUMS.txt
+# Verify dataset
+[[ ! -f SHA256SUMS.txt ]] || sha256sum -c SHA256SUMS.txt
+
+if [[ -f md5sums ]]
+then
+	md5sum -c md5sums
+fi
+list -- --fast | while read f
+do
+	if [[ -z "$(echo "${f}" | grep -E "^bin/")" ]] &&
+		[[ -z "$(grep -E " (\./)?${f//\./\\.}$" md5sums)" ]]
+	then
+		md5sum "${f}" >> md5sums
+	fi
+done
