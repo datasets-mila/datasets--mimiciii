@@ -80,6 +80,13 @@ function enhanced_getopt {
 	echo "${_PARSED}"
 }
 
+function activate_datalad {
+	git-annex version >/dev/null 2>&1 && datalad --version >/dev/null 2>&1 || [[ ! -z "${_DATALAD_SRC}" ]]
+	exit_on_error_code "Failed to activate datalad with source '${_DATALAD_SRC}'. Please set the '_DATALAD_SRC' environment variable"
+	source "${_DATALAD_SRC}"
+	exit_on_error_code "Failed to activate datalad with source '${_DATALAD_SRC}'"
+}
+
 function init_conda_env {
 	local _name=
 	local _prefixroot=
